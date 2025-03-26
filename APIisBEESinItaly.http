@@ -1,0 +1,6 @@
+@APIisBEESinItaly_HostAddress = http://localhost:5155
+
+GET {{APIisBEESinItaly_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

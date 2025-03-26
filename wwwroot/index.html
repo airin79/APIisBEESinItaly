@@ -1,0 +1,128 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pets List</title>
+
+    <!-- Link to the CSS file -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Save table in PDF - Agregar jsPDF CDN en el head -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.18/jspdf.plugin.autotable.min.js"></script>
+
+    <!-- Save table in Excel - Add SheetJS to your project -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
+
+</head>
+<body>
+    <h1>Pets List</h1>
+    <table id="petsTable" border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Age</th>
+                <th>Breed</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data will be injected here -->
+        </tbody>
+    </table>
+
+    <!-- Botón para generar el PDF -->
+    <button id="downloadPdfButton">Generar PDF</button>
+
+    <!-- Botón para generar el Excel -->
+    <button id="downloadExcelButton">Generar Excel</button>
+
+    <script>
+        // Function to fetch data and display it in the table
+        function fetchPets() {
+            fetch("http://localhost:5155/api/pets")
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data); // Check the data structure in the console
+                    displayPetsInTable(data);
+                })
+                .catch(error => console.log(error));
+        }
+
+        // Function to render pets data in the table
+        function displayPetsInTable(pets) {
+            const tableBody = document.querySelector("#petsTable tbody");
+            tableBody.innerHTML = ""; // Clear the table before adding new data
+
+            pets.forEach(pet => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                      <td>${pet.id}</td>
+                      <td>${pet.name}</td>
+                      <td>${pet.age}</td>
+                      <td>${pet.breed}</td>
+                    `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function generateExcel() {
+            // Seleccionamos la tabla
+            const table = document.getElementById("petsTable");
+
+            // Convertimos la tabla a un libro de Excel usando la biblioteca SheetJS
+            const wb = XLSX.utils.table_to_book(table, { sheet: "Pets" });
+
+            // Generamos el archivo Excel y lo descargamos
+            XLSX.writeFile(wb, "pets_list.xlsx");
+        }
+
+
+        // Function to generate PDF from the table data
+        function generatePdf() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Add title
+            doc.text("PETS LIST", 105, 10, null, null, "center");
+
+            // Table headers
+            const headers = ["ID", "Name", "Age", "Breed"];
+
+            // Get table rows data
+            const rows = [];
+            const tableRows = document.querySelectorAll("#petsTable tbody tr");
+            tableRows.forEach(row => {
+                const cols = row.querySelectorAll("td");
+                const rowData = [
+                    cols[0].textContent,
+                    cols[1].textContent,
+                    cols[2].textContent,
+                    cols[3].textContent
+                ];
+                rows.push(rowData);
+            });
+
+            // Add table to PDF
+            doc.autoTable({
+                head: [headers],
+                body: rows,
+                startY: 20, // Position of the table on the page
+                theme: 'striped' // Optional: makes the table striped
+            });
+
+            // Save the PDF
+            doc.save("ReporteMascotas.pdf");
+            console.log("PDF generado y guardado");
+        }
+
+        // Fetch pets data when the page loads
+        window.onload = fetchPets;
+
+        document.getElementById("downloadPdfButton").addEventListener("click", generatePdf);
+        document.getElementById("downloadExcelButton").addEventListener("click", generateExcel);
+    </script>
+</body>
+</html>
+

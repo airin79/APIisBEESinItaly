@@ -1,0 +1,59 @@
+﻿@model IEnumerable<APIisBEESinItaly.Models.Pet>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pets List</title>
+</head>
+<body>
+    <h1>Pets List</h1>
+    <table id="petsTable" border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Age</th>
+                <th>Breed</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data will be injected here -->
+        </tbody>
+    </table>
+
+    <script>
+        // Function to fetch data and display it in the table
+        function fetchPets() {
+          fetch("http://localhost:5155/api/pets")
+            .then(response => response.json())
+            .then(data => {
+              console.log(data); // Check the data structure in the console
+              displayPetsInTable(data);
+            })
+            .catch(error => console.log(error));
+        }
+
+        // Function to render pets data in the table
+        function displayPetsInTable(pets) {
+          const tableBody = document.querySelector("#petsTable tbody");
+          tableBody.innerHTML = ""; // Clear the table before adding new data
+
+          pets.forEach(pet => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>${pet.id}</td>
+              <td>${pet.name}</td>
+              <td>${pet.age}</td>
+              <td>${pet.breed}</td>
+            `;
+            tableBody.appendChild(row);
+          });
+        }
+
+        // Fetch pets data when the page loads
+        window.onload = fetchPets;
+    </script>
+</body>
+</html>
