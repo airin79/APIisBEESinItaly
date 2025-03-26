@@ -6,7 +6,7 @@
     <title>Pets List</title>
 
     <!-- Link to the CSS file -->
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css//styles.css">
 
     <!-- Save table in PDF - Agregar jsPDF CDN en el head -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -15,9 +15,14 @@
     <!-- Save table in Excel - Add SheetJS to your project -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
 
+    <script src="js/pagination.js"></script> <!-- Table pagination -->
 </head>
 <body>
     <h1>Pets List</h1>
+    <button id="downloadPdfButton">Generar PDF current rows</button> <!-- generate visible rows -->
+    <!-- <button id="downloadPdfButton">Generar PDF all rows</button> <!-- generate complete pdf-->
+    <button id="downloadExcelButton">Generar Excel</button> <!-- Botón para generar el Excel -->
+    <button id="addMoreButton">Añadir Más</button>  <!-- Botón para añadir más mascotas -->
     <table id="petsTable" border="1">
         <thead>
             <tr>
@@ -31,14 +36,14 @@
             <!-- Data will be injected here -->
         </tbody>
     </table>
-
-    <!-- Botón para generar el PDF -->
-    <button id="downloadPdfButton">Generar PDF</button>
-
-    <!-- Botón para generar el Excel -->
-    <button id="downloadExcelButton">Generar Excel</button>
+    <div>
+        <button id="prevPage">⬅️ Anterior</button>
+        <span id="pageInfo"></span>
+        <button id="nextPage">Siguiente ➡️</button>
+    </div>
 
     <script>
+
         // Function to fetch data and display it in the table
         function fetchPets() {
             fetch("http://localhost:5155/api/pets")
@@ -58,11 +63,11 @@
             pets.forEach(pet => {
                 const row = document.createElement("tr");
                 row.innerHTML = `
-                      <td>${pet.id}</td>
-                      <td>${pet.name}</td>
-                      <td>${pet.age}</td>
-                      <td>${pet.breed}</td>
-                    `;
+                                                          <td>${pet.id}</td>
+                                                          <td>${pet.name}</td>
+                                                          <td>${pet.age}</td>
+                                                          <td>${pet.breed}</td>
+                                                        `;
                 tableBody.appendChild(row);
             });
         }
@@ -122,6 +127,25 @@
 
         document.getElementById("downloadPdfButton").addEventListener("click", generatePdf);
         document.getElementById("downloadExcelButton").addEventListener("click", generateExcel);
+    </script>
+
+
+
+    <script>
+        document.getElementById("addMoreButton").addEventListener("click", function () {
+            fetch("http://localhost:5155/api/pets/addmore", {
+                method: "POST"
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert("Added 5 (to be dynamic) more Pets");
+                        fetchPets(); // Refrescar la tabla con los nuevos datos
+                    } else {
+                        alert("Error adding Pets");
+                    }
+                })
+                .catch(error => console.log("Error:", error));
+        });
     </script>
 </body>
 </html>
