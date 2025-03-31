@@ -25,6 +25,7 @@
             row.innerHTML = `
                 <td>${pet.id}</td>
                 <td>${pet.name}</td>
+                <td>${pet.birthDate ? new Date(pet.birthDate).toLocaleDateString() : 'N/A'}</td>
                 <td>${pet.age}</td>
                 <td>${pet.breed}</td>
             `;
@@ -71,7 +72,7 @@ function generateFullPdf() {
     const doc = new jsPDF();
     doc.text("COMPLETE PETS LIST (All Rows)", 105, 10, null, null, "center");
 
-    const headers = ["ID", "Name", "Age", "Breed"];
+    const headers = ["ID", "Name", "Birth Date", "Age", "Breed"];
     let allPets = [];
 
     function fetchAllPages(page = 1) {
@@ -100,7 +101,7 @@ function generateFullPdf() {
             return Promise.all(fetchPromises);
         })
         .then(() => {
-            const rows = allPets.map(pet => [pet.id, pet.name, pet.age, pet.breed]);
+            const rows = allPets.map(pet => [pet.id, pet.name, pet.birthdate, pet.age, pet.breed]);
 
             doc.autoTable({
                 head: [headers],

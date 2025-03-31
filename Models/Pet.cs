@@ -6,5 +6,7 @@
         public string Name { get; set; } = string.Empty;     // Nombre del pet
 
         //public int Age { get; set; } = 0;                 // Pet's age
+        // public Breed ---
+        public DateTime? BirthDate { get; set; } // Nullable date
     }
 }

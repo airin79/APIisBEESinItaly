@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using APIisBEESinItaly.Data;
 using APIisBEESinItaly.Models;
 using Newtonsoft.Json;
+using Microsoft.Data.SqlClient;
 
 namespace APIisBEESinItaly.Controllers
 {
@@ -39,65 +40,72 @@ namespace APIisBEESinItaly.Controllers
             return Ok(pets);
         }
 
-        /*
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Pet>>> GetPets(
-        int page = 1,
-        int pageSize = 10,
-        string searchTerm = "",
-        string species = "")
+        [HttpPost("addmore/{numRecords}")]
+        ///
+        public async Task<IActionResult> AddMorePets(int numRecords)
         {
-            var query = _context.Pets.AsQueryable();
-
-            // Búsqueda por nombre de mascota (si se pasa un término de búsqueda)
-            if (!string.IsNullOrEmpty(searchTerm))
+            if (numRecords <= 0)
             {
-                query = query.Where(p => p.Name.Contains(searchTerm));
+                return BadRequest("Number of rows must be > 0");
             }
 
-            // Paginación: saltamos los resultados anteriores (page-1) * pageSize
-            var totalItems = await query.CountAsync();
-            var pets = await query
-                .Skip((page - 1) * pageSize) // Skip paginación
-                .Take(pageSize) // Limitar los resultados
-                .ToListAsync();
+            //await _context.Database.ExecuteSqlRawAsync("EXEC AddMorePets @NumRecords = ");
+            /*await _context.Database.ExecuteSqlRawAsync("EXEC AddMorePets @NumRecords",
+                new SqlParameter("@NumRecords", numRecords));
 
-            // Retornar los resultados junto con los metadatos de la paginación
-            var paginationMetadata = new
+            return Ok($"Successfully added {numRecords} records");
+            */
+
+            try
             {
-                totalItems,
-                totalPages = (int)Math.Ceiling(totalItems / (double)pageSize),
-                currentPage = page,
-                pageSize
-            };
+                await _context.Database.ExecuteSqlRawAsync("EXEC AddMorePets @NumRecords",
+                    new SqlParameter("@NumRecords", numRecords));
 
-            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(paginationMetadata));
+                return Ok(new { message = $"Successfully added {numRecords} records" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Internal Server Error: {ex.Message}" });
+            }
 
-            return Ok(pets);
-        }*/
-
-        [HttpPost("addmore")]
-        public async Task<IActionResult> AddMorePets()
-        {
             /* STORE PROCEDURE AddMorePets
             INSERT INTO [MyPetsDB].[dbo].[Pets] ([Name], [Age])
             SELECT CONCAT('Name', n), n
             FROM (SELECT TOP 5 ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS n 
                   FROM master.dbo.spt_values) AS numbers;
             */
-            // Improve, adding sequencial from the last NameX
+            /* Improve, adding sequencial from the last NameX
+            --Eliminar la stored procedure si existe
+            IF OBJECT_ID('dbo.AddMorePets', 'P') IS NOT NULL
+                DROP PROCEDURE dbo.AddMorePets
+            GO
 
-            await _context.Database.ExecuteSqlRawAsync("EXEC AddMorePets");
-            return Ok(new { message = "Se añadieron más mascotas" });
+            -- Crear la nueva stored procedure
+            CREATE PROCEDURE AddMorePets
+            AS
+            BEGIN
+                DECLARE @LastId INT;
+
+            --Obtener el último Id insertado en la tabla
+            SELECT @LastId = ISNULL(MAX(Id), 0) FROM[dbo].[Pets];
+
+            --Permitir la inserción manual en la columna ID(evitar el autoincremento de IDENTITY)
+            SET IDENTITY_INSERT[dbo].[Pets] ON;
+
+            --Insertar nuevos registros, comenzando desde el último Id +1
+            INSERT INTO[dbo].[Pets] ([Id], [Name], [Age])
+            SELECT @LastId +n, CONCAT('Name', @LastId + n), n
+            FROM(
+                SELECT TOP 5 ROW_NUMBER() OVER(ORDER BY(SELECT NULL)) AS n
+                FROM master.dbo.spt_values
+            ) AS numbers;
+
+            --Restablecer IDENTITY_INSERT a OFF para dejar que SQL Server maneje el autoincremento del Id
+            SET IDENTITY_INSERT[dbo].[Pets] OFF;
+            */
+
+
         }
-
-
-        // GET: api/pets
-        /*   [HttpGet]
-           public async Task<ActionResult<IEnumerable<Pet>>> Index()
-           {
-               return await _context.Pets.ToListAsync();
-           }*/
 
         // GET: api/pets/{id}
         [HttpGet("{id}")]

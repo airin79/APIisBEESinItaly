@@ -62,3 +62,40 @@ button {
     font-weight: bold;
     color: #333;
 }
+
+#numPetsToAdd {
+    display: inline-block; /* Asegura que el input esté visible */
+    visibility: visible; /* Asegura que no esté oculto */
+    width: 30px; /* Ajusta el tamaño */
+    padding: 5px;
+    font-size: 16px;
+}
+/* Estilos para la etiqueta similar al botón */
+label {
+    display: inline-block;
+    background: linear-gradient(135deg, #007bff, #0056b3); /* Degradado azul */
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 12px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+    /* Efecto hover */
+    label:hover {
+        background: linear-gradient(135deg, #0056b3, #003d82);
+        transform: scale(1.05);
+    }
+
+    /* Estilo de la etiqueta cuando está deshabilitada */
+    label:disabled {
+        background: #ccc;
+        color: #666;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
