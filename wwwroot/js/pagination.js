@@ -3,7 +3,7 @@
     const pageSize = 10;
     let totalPages = 1;
 
-    function fetchPets(page = 1) {
+    function fetchPets(page) {
         fetch(`http://localhost:5155/api/pets?page=${page}&pageSize=${pageSize}`)
             .then(response => {
                 totalPages = parseInt(response.headers.get("X-Total-Pages")) || 1;
@@ -34,11 +34,14 @@
     }
 
     function updatePaginationInfo() {
-        document.getElementById("pageInfo").textContent = `Page ${currentPage} of ${totalPages}`;
+        document.getElementById("pageInfo").textContent = `Página ${currentPage} de ${totalPages}`;
         document.getElementById("prevPage").disabled = currentPage === 1;
         document.getElementById("nextPage").disabled = currentPage === totalPages;
+        document.getElementById("firstPage").disabled = currentPage === 1;
+        document.getElementById("lastPage").disabled = currentPage === totalPages;
     }
 
+    /*
     document.getElementById("prevPage").addEventListener("click", function () {
         if (currentPage > 1) {
             currentPage--;
@@ -53,14 +56,70 @@
         }
     });
 
+    document.getElementById("firstPage").addEventListener("click", function () {
+
+        console.log("first page: ");
+        console.log(currentPage);
+
+        if (currentPage !== 1) {
+            currentPage = 1;
+            fetchPets(currentPage);
+        }
+    });
+
+    document.getElementById("lastPage").addEventListener("click", function () {
+        if (currentPage !== totalPages) {
+            currentPage = totalPages;
+            fetchPets(currentPage);
+        }
+    });*/
+
     // Attach event listener to "Generate All PDF" button
     const fullPdfButton = document.getElementById("downloadFullPdfButton");
     if (fullPdfButton) {
-        fullPdfButton.addEventListener("click", generateFullPdf);
-        console.log("Full PDF button event added successfully.");
+        fullPdfButton.addEventListener("click", generateFullPdf);    
     } else {
         console.error("Button #downloadFullPdfButton not found.");
     }
+
+
+    function addPaginationEventListeners() {
+        const firstPageBtn = document.getElementById("firstPage");
+        const lastPageBtn = document.getElementById("lastPage");
+
+        document.getElementById("prevPage").addEventListener("click", function () {
+            if (currentPage > 1) {
+                currentPage--;
+                fetchPets(currentPage);
+            }
+        });
+
+        document.getElementById("nextPage").addEventListener("click", function () {
+            if (currentPage < totalPages) {
+                currentPage++;
+                fetchPets(currentPage);
+            }
+        });
+
+        firstPageBtn.addEventListener("click", function () {
+            console.log("Navegando a la primera página.");
+            if (currentPage !== 1) {
+                currentPage = 1;
+                fetchPets(currentPage);
+            }
+        });
+
+        lastPageBtn.addEventListener("click", function () {
+            console.log("Navegando a la última página.");
+            if (currentPage !== totalPages) {
+                currentPage = totalPages;
+                fetchPets(currentPage);
+            }
+        });
+    }
+
+    // Wait for DOM to be fully loaded
+    addPaginationEventListeners();
 
     // Load first page
     fetchPets(currentPage);

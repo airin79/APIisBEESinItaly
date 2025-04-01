@@ -52,8 +52,6 @@ namespace APIisBEESinItaly.Controllers
             //await _context.Database.ExecuteSqlRawAsync("EXEC AddMorePets @NumRecords = ");
             /*await _context.Database.ExecuteSqlRawAsync("EXEC AddMorePets @NumRecords",
                 new SqlParameter("@NumRecords", numRecords));
-
-            return Ok($"Successfully added {numRecords} records");
             */
 
             try
@@ -61,7 +59,7 @@ namespace APIisBEESinItaly.Controllers
                 await _context.Database.ExecuteSqlRawAsync("EXEC AddMorePets @NumRecords",
                     new SqlParameter("@NumRecords", numRecords));
 
-                return Ok(new { message = $"Successfully added {numRecords} records" });
+                return Ok(new { message = $"Successfully added {numRecords} records - refresh your page" });
             }
             catch (Exception ex)
             {

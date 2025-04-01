@@ -40,11 +40,13 @@
         </tbody>
     </table>
 
-    <!-- Botones de paginación -->
+    <!-- Page navigation -->
     <div id="pagination-container">
-        <button id="prevPage">⬅️ Anterior</button>
-        <span id="pageInfo">Página 1</span>
-        <button id="nextPage">Siguiente ➡️</button>
+        <button id="firstPage">⏪ First</button>
+        <button id="prevPage">⬅️ Previous</button>
+        <span id="pageInfo">Page 1</span>
+        <button id="nextPage">Next ➡️</button>
+        <button id="lastPage">Last ⏩</button>
     </div>
 
     <script>
@@ -68,12 +70,12 @@
             pets.forEach(pet => {
                 const row = document.createElement("tr");
                 row.innerHTML = `
-                                            <td>${pet.id}</td>
-                                            <td>${pet.name}</td>
-                                            <td>${pet.birthdate}</td>
-                                            <td>${pet.age}</td>
-                                            <td>${pet.breed}</td>
-                                        `;
+                                                <td>${pet.id}</td>
+                                                <td>${pet.name}</td>
+                                                <td>${pet.birthdate}</td>
+                                                <td>${pet.age}</td>
+                                                <td>${pet.breed}</td>
+                                            `;
                 tableBody.appendChild(row);
             });
         }
@@ -88,8 +90,7 @@
             // Generamos el archivo Excel y lo descargamos
             XLSX.writeFile(wb, "pets_list.xlsx");
         }
-
-
+       
         // Function to generate PDF from the table data
         function generatePdf() {
             const { jsPDF } = window.jspdf;
@@ -152,19 +153,28 @@
                         "Content-Type": "application/json"
                     }
                 })
-                    .then(response => response.json()) // Read response as JSON
-                    .then(data => {
-                        document.getElementById("responseMessage").innerText = data.message;
-                        document.getElementById("responseMessage").style.color = "green";
-                    })
-                    .catch(error => {
-                        document.getElementById("responseMessage").innerText = "Error" + error.message;
-                        document.getElementById("responseMessage").style.color = "red";
-                    });
+                .then(response => response.json()) // Read response as JSON
+                .then(data => {
+                    document.getElementById("responseMessage").innerText = data.message;
+                    document.getElementById("responseMessage").style.color = "green";
+                    console.log("MESSAGGIO AUTO");
+                    console.log(data.message);
+
+                    // Load data
+                    //loadPets();
+
+                    // reload page 1
+                    // setTimeout(() => location.reload(), 1000); // wait and reload
+                })
+                .catch(error => {
+                    document.getElementById("responseMessage").innerText = "Error" + error.message;
+                    document.getElementById("responseMessage").style.color = "red";
+                });
             });
         });
     </script>
+
     <script src="js/pagination.js"></script> <!-- Table pagination -->
-</body>
+ </body>
 </html>
 
